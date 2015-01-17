@@ -5,9 +5,15 @@ import csv
 import cPickle as pickle
 import os.path
 import scipy.ndimage as nd
+import pandas as pd
 
-TRAINING_SET_PATH = '/data/train.csv'
-TRAINING_SET_PICKLE_PATH = '/pickles/train.p'
+TRAINING_SET_PATH = os.path.join("data", "train.csv")
+TRAINING_SET_PICKLE_PATH = os.path.join("pickles", "train.p")
+
+TEST_SET_PATH = os.path.join("data", "test.csv")
+BENCHMARK_PATH = os.path.join("data", "knn_benchmark.csv")
+RESULTS_PATH = os.path.join("data", "result.csv")
+
 
 USE_PICKLE = False
 IMAGE_WIDTH = 28
@@ -94,3 +100,13 @@ def rotate_dataset(X,Y):
         X = np.vstack((X,XX))
         Y = np.hstack((Y,Y))
     return X, Y
+
+def get_test_data_set():
+    test_data = pd.read_csv(TEST_SET_PATH).values
+    return test_data
+
+def get_benchmark():
+    return pd.read_csv(BENCHMARK_PATH)
+
+def write_to_csv(subm):
+    subm.to_csv(RESULTS_PATH, index_label='ImageId', col=['Label'], index=False)
