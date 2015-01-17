@@ -1,3 +1,3 @@
-# DOCKER-VERSION 1.1.2
+# DOCKER-VERSION 1.4
 FROM namsangboy/ipython-scikit
 COPY . /src
