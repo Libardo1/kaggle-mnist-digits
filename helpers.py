@@ -35,7 +35,6 @@ def load_training_digits(limit=np.inf, offset=0):
     with open(TRAINING_SET_PATH, 'r') as f:
         i = 0
         for line in f.readlines():
-            print i
             if i < offset:
                 i+=1
                 continue
