@@ -7,12 +7,12 @@ import os.path
 import scipy.ndimage as nd
 import pandas as pd
 
-TRAINING_SET_PATH = os.path.join("data", "train.csv")
-TRAINING_SET_PICKLE_PATH = os.path.join("pickles", "train.p")
+TRAINING_SET_PATH = os.path.join(os.path.dirname(__file__), "data", "train.csv")
+TRAINING_SET_PICKLE_PATH = os.path.join(os.path.dirname(__file__), "pickles", "train.p")
 
-TEST_SET_PATH = os.path.join("data", "test.csv")
-BENCHMARK_PATH = os.path.join("data", "knn_benchmark.csv")
-RESULTS_PATH = os.path.join("data", "result.csv")
+TEST_SET_PATH = os.path.join(os.path.dirname(__file__), "data", "test.csv")
+BENCHMARK_PATH = os.path.join(os.path.dirname(__file__), "data", "knn_benchmark.csv")
+RESULTS_PATH = os.path.join(os.path.dirname(__file__), "data", "result.csv")
 
 
 USE_PICKLE = False
