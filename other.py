@@ -1,12 +1,6 @@
-# Author: Gael Varoquaux <gael dot varoquaux at normalesup dot org>
-# License: BSD 3 clause
-
-# Standard scientific Python imports
 import matplotlib.pyplot as plt
 import sys
 from sklearn.cross_validation import train_test_split
-
-# Import datasets, classifiers and performance metrics
 from sklearn import datasets, svm, metrics
 from helpers import load_training_digits, images_to_data, nudge_dataset, rotate_dataset, compress_images
 import numpy as np
@@ -19,25 +13,19 @@ np.set_printoptions(threshold=np.nan)
 
 def run():
     digits = datasets.load_digits()
-    images = digits.images
-    target = digits.target
 
-    images, target = load_training_digits(1000)
+    images, target = load_training_digits()
 
     X = images_to_data(images)
-    print "X", len(X), len(images)
-    print "XX", X.shape
 
     Y = target
-    print Y
-    print X.shape
 
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y,
                                                             test_size=0.5,
                                                             random_state=0)
 
     X_train, Y_train = nudge_dataset(X_train, Y_train)
-    #X_train, Y_train = rotate_dataset(X_train, Y_train)
+    X_train, Y_train = rotate_dataset(X_train, Y_train)
 
     images_and_labels = list(zip(images, Y))
     for index, (image, label) in enumerate(images_and_labels[:4]):

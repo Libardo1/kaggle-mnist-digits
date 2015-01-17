@@ -63,10 +63,6 @@ def compress_images(images):
     return np.array(new_images)
 
 def nudge_dataset(X, Y):
-    """
-    This produces a dataset 5 times bigger than the original one,
-    by moving the images in X around by 1px to left, right, down, up
-    """
     direction_vectors = [
         [[0, 1, 0],
          [0, 0, 0],
