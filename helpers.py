@@ -30,14 +30,12 @@ def chunks_of_training_data(num_chunks=60):
 
 def load_training_digits(limit=np.inf, offset=0):
     offset = offset + 1
-    if USE_PICKLE and os.path.exists(TRAINING_SET_PICKLE_PATH):
-        print "Loading pickle..."
-        return pickle.load(open(TRAINING_SET_PICKLE_PATH, "rb" ))
     X = []
     Y = []
     with open(TRAINING_SET_PATH, 'r') as f:
         i = 0
         for line in f.readlines():
+            print i
             if i < offset:
                 i+=1
                 continue
@@ -54,8 +52,6 @@ def load_training_digits(limit=np.inf, offset=0):
     image = np.array(X)
     target = np.array(Y)
 
-    if USE_PICKLE:
-        pickle.dump((image, target), open(TRAINING_SET_PICKLE_PATH, "wb" ))
     return (image, target)
 
 

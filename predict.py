@@ -10,6 +10,7 @@ import pandas as pd
 IMAGE_WIDTH = 28
 
 def run():
+    print "Predict"
     classifier = svm.SVC(C=2.8, gamma=0.0073, kernel='rbf')
     i = 0
     for images, target in chunks_of_training_data():
