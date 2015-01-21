@@ -12,12 +12,8 @@ IMAGE_WIDTH = 28
 np.set_printoptions(threshold=np.nan)
 
 def run():
-    digits = datasets.load_digits()
-
-    images, target = load_training_digits()
-
+    images, target = load_training_digits(100)
     X = images_to_data(images)
-
     Y = target
 
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y,
@@ -28,7 +24,8 @@ def run():
     X_train, Y_train = rotate_dataset(X_train, Y_train)
 
     images_and_labels = list(zip(images, Y))
-    for index, (image, label) in enumerate(images_and_labels[:4]):
+    faw = images_and_labels[:2] + images_and_labels[100:102]
+    for index, (image, label) in enumerate(faw):
         plt.subplot(2, 4, index + 1)
         plt.axis('off')
         plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
@@ -52,12 +49,6 @@ def run():
         plt.title('Prediction: %i' % prediction)
 
     plt.show()
-
-    kaggle_data = pd.read_csv("data/test.csv").values
-    kaggle_data = np.asarray(kaggle_data / 255.0, 'float32')
-    subm = pd.read_csv("data/knn_benchmark.csv")
-    subm.Label = classifier.predict(kaggle_data)
-    subm.to_csv("data/result.csv", index_label='ImageId', col=['Label'], index=False)
 
 def __main__(args):
     run()

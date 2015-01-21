@@ -6,6 +6,7 @@ import cPickle as pickle
 import os.path
 import scipy.ndimage as nd
 import pandas as pd
+import random
 
 TRAINING_SET_PATH = os.path.join(os.path.dirname(__file__), "data", "train.csv")
 TRAINING_SET_PICKLE_PATH = os.path.join(os.path.dirname(__file__), "pickles", "train.p")
@@ -20,7 +21,7 @@ IMAGE_WIDTH = 28
 
 N_TRAINING_DIGITS = 42000
 
-def chunks_of_training_data(num_chunks=60):
+def chunks_of_training_data(num_chunks=2):
     chunk_id = 0
     step_size = N_TRAINING_DIGITS/num_chunks
     while chunk_id < num_chunks:
@@ -53,6 +54,12 @@ def load_training_digits(limit=np.inf, offset=0):
 
     return (image, target)
 
+def load_training_data():
+    data = pd.DataFrame.as_matrix(pd.read_csv(TRAINING_SET_PATH))
+    Y = data[:, 0]
+    data = data[:, 1:] # trim first classification field
+    X = data/255.0
+    return X, Y
 
 def images_to_data(images):
     return np.reshape(images,(len(images),-1))
@@ -70,9 +77,8 @@ def compress_images(images):
     return np.array(new_images)
 
 def nudge_dataset(X, Y):
-    NUDGE_RANGE = 4
-    N_NEW_SETS = NUDGE_RANGE*4 + 1
-    direction_vectors = [
+    nudge_size = 2
+    direction_matricies = [
         [[0, 1, 0],
          [0, 0, 0],
          [0, 0, 0]],
@@ -89,23 +95,27 @@ def nudge_dataset(X, Y):
          [0, 0, 0],
          [0, 1, 0]]]
 
-    scaled_direction_vectors = [[[n*i for n in comp] for comp in vect] for vect in direction_vectors for i in range(1,NUDGE_RANGE+1)]
+    scaled_direction_matricies = [[[comp*nudge_size for comp in vect] for vect in matrix] for matrix in direction_matricies]
     shift = lambda x, w: convolve(x.reshape((IMAGE_WIDTH, IMAGE_WIDTH)), mode='constant',
                                   weights=w).ravel()
     X = np.concatenate([X] +
                        [np.apply_along_axis(shift, 1, X, vector)
-                        for vector in scaled_direction_vectors])
+                        for vector in scaled_direction_matricies])
 
-    Y = np.concatenate([Y for _ in range(N_NEW_SETS)], axis=0)
+    Y = np.concatenate([Y for _ in range(5)], axis=0)
     return X, Y
 
-def rotate_dataset(X,Y):
-    XX = np.zeros(X.shape)
-    for index in range(X.shape[0]):
-        angle = np.random.randint(-7,7)
-        XX[index,:] = nd.rotate(np.reshape(X[index,:],((IMAGE_WIDTH,IMAGE_WIDTH))),angle,reshape=False).ravel()
-        X = np.vstack((X,XX))
-        Y = np.hstack((Y,Y))
+def rotate_dataset(X, Y):
+    n_images = X.shape[0]
+    for index in range(n_images):
+        if index % 100 == 0:
+            print index
+        angle = random.uniform(np.pi*(-1/4.0), np.pi*(1/4.0))
+        XX = nd.rotate(X[index, :], angle, reshape=False).ravel()
+        YY = Y[index]
+        print XX.shape
+        X = np.hstack((X,XX))
+        Y = np.hstack((Y,YY))
     return X, Y
 
 def get_test_data_set():
