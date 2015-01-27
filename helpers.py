@@ -7,6 +7,7 @@ import os.path
 import scipy.ndimage as nd
 import pandas as pd
 import random
+import scipy
 
 TRAINING_SET_PATH = os.path.join(os.path.dirname(__file__), "data", "train.csv")
 TRAINING_SET_PICKLE_PATH = os.path.join(os.path.dirname(__file__), "pickles", "train.p")
@@ -20,6 +21,10 @@ USE_PICKLE = False
 IMAGE_WIDTH = 28
 
 N_TRAINING_DIGITS = 42000
+
+def normalize_data(X):
+    X = X/255.0
+    return X
 
 def chunks_of_training_data(num_chunks=2):
     chunk_id = 0
@@ -58,7 +63,7 @@ def load_training_data():
     data = pd.DataFrame.as_matrix(pd.read_csv(TRAINING_SET_PATH))
     Y = data[:, 0]
     data = data[:, 1:] # trim first classification field
-    X = data/255.0
+    X = normalize_data(data)
     return X, Y
 
 def images_to_data(images):
@@ -106,21 +111,28 @@ def nudge_dataset(X, Y):
     return X, Y
 
 def rotate_dataset(X, Y):
-    n_images = X.shape[0]
-    for index in range(n_images):
-        if index % 100 == 0:
-            print index
-        angle = random.uniform(np.pi*(-1/4.0), np.pi*(1/4.0))
-        XX = nd.rotate(X[index, :], angle, reshape=False).ravel()
-        YY = Y[index]
-        print XX.shape
-        X = np.hstack((X,XX))
-        Y = np.hstack((Y,YY))
-    return X, Y
+    rot_X = np.zeros(X.shape)
+    for index in range(X.shape[0]):
+        sign = random.choice([-1, 1])
+        angle = np.random.randint(8, 16)*sign
+        rot_X[index, :] = threshold(nd.rotate(np.reshape(X[index, :], ((IMAGE_WIDTH, IMAGE_WIDTH))), angle, reshape=False).ravel())
+    XX = np.vstack((X,rot_X))
+    YY = np.hstack((Y,Y))
+    return XX, YY
+
+def threshold(X):
+    X[X < 0.3] = 0.0
+    X[X >= 0.8] = 1.0
+    X = sigmoid(X)
+    return X
+
+def sigmoid(X):
+    return scipy.special.expit(X)
 
 def get_test_data_set():
-    test_data = pd.read_csv(TEST_SET_PATH).values
-    return test_data
+    data = pd.DataFrame.as_matrix(pd.read_csv(TEST_SET_PATH))
+    X = normalize_data(data)
+    return X
 
 def get_benchmark():
     return pd.read_csv(BENCHMARK_PATH)

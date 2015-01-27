@@ -11,32 +11,30 @@ from nolearn.dbn import DBN
 
 IMAGE_WIDTH = 28
 
-def run():
+def run(testing=False):
     X, Y = load_training_data()
-
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y,
+    X_train = X
+    Y_train = Y
+    if testing:
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y,
                                                             test_size=0.1,
                                                             random_state=0)
 
-    # X_train = X
-    # Y_train = Y
-
+    #X_train, Y_train = rotate_dataset(X_train, Y_train)
     X_train, Y_train = nudge_dataset(X_train, Y_train)
-    print "nudge done"
-    # X_train, Y_train = rotate_dataset(X_train, Y_train)
-    print "rotation done"
 
     n_features = X_train.shape[1]
     n_classes = 10
-    classifier = DBN([n_features, 300, n_classes], learn_rates=0.3, learn_rate_decays=0.9 ,epochs=25, verbose=1)
+    classifier = DBN([n_features, 6000, n_classes], 
+        learn_rates=0.3, learn_rate_decays=0.9 ,epochs=60, verbose=1)
 
     classifier.fit(X_train, Y_train)
 
-    acc_nn = classifier.score(X_test,Y_test)
-    print "acc_n", acc_nn
+    if testing:
+        acc_nn = classifier.score(X_test,Y_test)
+        print "acc_n", acc_nn
 
     test_data = get_test_data_set()
-    test_data = np.asarray(test_data / 255.0, 'float32')
     subm = get_benchmark()
     subm.Label = classifier.predict(test_data)
     write_to_csv(subm)
